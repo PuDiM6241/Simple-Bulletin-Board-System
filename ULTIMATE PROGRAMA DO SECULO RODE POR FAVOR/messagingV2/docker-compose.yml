@@ -1,0 +1,48 @@
+
+x-app: &app
+  build: .
+  image: messaging-app
+
+x-server: &server
+  <<: *app
+  command: python server.py
+  volumes:
+    - ./data:/data
+  depends_on: [broker, proxy, reference]
+
+services:
+  broker:                         
+    <<: *app
+    command: python broker.py
+    ports: ["5555:5555", "5556:5556"]
+
+  proxy:                         
+    <<: *app
+    command: python proxy.py
+    ports: ["5557:5557", "5558:5558"]   
+
+  reference:                      
+    <<: *app
+    command: python reference.py
+
+  server1:
+    <<: *server
+    environment: {SERVER_NAME: server1}
+  server2:
+    <<: *server
+    environment: {SERVER_NAME: server2}
+  server3:
+    <<: *server
+    environment: {SERVER_NAME: server3}
+  server4:                        
+    <<: *server
+    environment: {SERVER_NAME: server4}
+    profiles: ["extra"]
+
+  client:
+    build:
+      context: ./ClientCs
+      dockerfile: Dockerfile.client
+    depends_on: [server1, server2, server3]
+    deploy:
+      replicas: 4

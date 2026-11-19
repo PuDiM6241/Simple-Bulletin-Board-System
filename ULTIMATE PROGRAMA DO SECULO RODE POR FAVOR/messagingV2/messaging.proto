@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package messaging;
+
+// ------------------
+//     messageSchema
+// ------------------
+// Base do formato das mensagens na hora da compressao binaria
+
+
+message serverInfo {
+  string name = 1;
+  int32 rank = 2;
+}
+
+message package {
+  string id = 1;
+  string kind = 2;        // login, canal ou messagem.
+  string data = 3;
+  double timestamp = 4;
+}
+
+message envelope {
+  string type = 1;
+  string sender = 2;
+  double timestamp = 3;              // sistema timestamp
+  int64 logicalClock = 4;            // sistema heartbeat
+  string status = 5;                 // successo | erro
+  string error = 6;                  // usado so em erro
+  string username = 7;
+  string channel = 8;
+  string text = 9;
+  repeated string channels = 10;     //repeated é equivalente a lista
+  int64 rank = 11;
+  repeated serverInfo servers = 12;  //lsita de servidores para eleicao e comunicacao
+  string coordinator = 13;           //nome do servidor coordenador
+  double referenceTime = 14;
+  repeated package packages = 15;
+  string topic = 16;                  //topico PUB-SUB enviado dentro do envelope
+}
